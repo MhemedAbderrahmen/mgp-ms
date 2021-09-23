@@ -2,6 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import dotenv from 'dotenv'
 import {
+    deleteProduct,
     notFound,
     postProduct
 } from './controllers'
@@ -18,6 +19,8 @@ app.use((_, res, next) => {
     next()
 })
 app.post(`${apiRoot}/products`, makeCallback(postProduct))
+app.delete(`${apiRoot}/products/:id`, makeCallback(deleteProduct))
+
 app.use(makeCallback(notFound))
 
 // listen for requests
