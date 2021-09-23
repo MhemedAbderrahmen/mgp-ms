@@ -1,25 +1,36 @@
 import makeProduct from '../product'
-export default function makeAddProduct ({ productDb, handleModeration }) {
-    return async function addOrder (productInfo) {
+
+export default function makeAddProduct({productDb, handleModeration}) {
+    return async function addOrder(productInfo) {
+
         console.log(productInfo)
+
         const product = makeProduct(productInfo)
-        const exists = await productDb.findByHash({ hash: product.getHash() })
+        const exists = await productDb.findByHash({hash: product.getHash()})
         if (exists) {
             return exists
         }
 
-        const moderated = await handleModeration({ product })
-        const commentSource = moderated.getSource()
+        const moderated = await handleModeration({product})
+        const productSource = moderated.getSource()
+        const productDescriptions = moderated.getDescriptions()
+        console.log(productDescriptions)
         return productDb.insert({
-            author: moderated.getAuthor(),
-            createdOn: moderated.getCreatedOn(),
             id: moderated.getId(),
+            name: moderated.getName(),
+            sku: moderated.getSku(),
+            descriptions: {
+                short: productDescriptions.getShort(),
+                medium: productDescriptions.getMedium(),
+                long: productDescriptions.getLong()
+            },
+            media: moderated.getMedia(),
             modifiedOn: moderated.getModifiedOn(),
-            success:moderated.getSuccess(),
+            createdOn: moderated.getCreatedOn(),
             source: {
-                ip: commentSource.getIp(),
-                browser: commentSource.getBrowser(),
-                referrer: commentSource.getReferrer()
+                ip: productSource.getIp(),
+                browser: productSource.getBrowser(),
+                referrer: productSource.getReferrer()
             },
         })
     }

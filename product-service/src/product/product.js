@@ -1,41 +1,50 @@
-export default function buildMakeProduct({Id, md5, makeSource}) {
+export default function buildMakeProduct({Id, md5, makeSource, makeDescriptions}) {
     return function makeProduct({
-                                  author,
-                                  createdOn = Date.now(),
-                                  id = Id.makeId(),
-                                  source,
-                                  modifiedOn = Date.now(),
-                                  success = false
-                              } = {}) {
+                                    id = Id.makeId(),
+                                    name,
+                                    sku,
+                                    descriptions,
+                                    media,
+                                    source,
+                                    createdOn = Date.now(),
+                                    modifiedOn = Date.now(),
+                                } = {}) {
+
         if (!Id.isValidId(id)) {
             throw new Error('Order must have a valid id.')
         }
-        if (!author) {
-            throw new Error('Order must have an author.')
+        if (!name) {
+            throw new Error('Product must have a name.')
         }
-        if (author.length < 2) {
-            throw new Error("Order author's name must be longer than 2 characters.")
+        if (!sku) {
+            throw new Error("Product must have an sku.")
+        }
+        if (!descriptions) {
+            throw new Error("Product must have a description")
         }
         if (!source) {
             throw new Error('Order must have a source.')
         }
 
         const validSource = makeSource(source)
-        const deletedText = '.xX This Order has been deleted Xx.'
+        const validDescriptions = makeDescriptions(descriptions)
+
         let hash
 
         return Object.freeze({
-            getAuthor: () => author,
-            getCreatedOn: () => createdOn,
             getId: () => id,
-            getSuccess: () => success,
             getHash: () => hash || (hash = makeHash()),
+            getName: () => name,
+            getSku: () => sku,
+            getDescriptions: () => validDescriptions,
+            getMedia: () => media,
             getSource: () => validSource,
+            getCreatedOn: () => createdOn,
             getModifiedOn: () => modifiedOn,
         })
 
         function makeHash() {
-            return md5(author)
+            return md5(id)
         }
     }
 }
